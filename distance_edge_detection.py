@@ -1,3 +1,4 @@
+import time
 import os
 import asyncio
 import cozmo
@@ -70,7 +71,7 @@ class EdgeTest:
 
     # Auto-paramter Canny edge detection adapted from:
     # http://www.pyimagesearch.com/2015/04/06/zero-parameter-automatic-canny-edge-detection-with-python-and-opencv/
-    def auto_canny(self, img, sigma=0.33):
+    def auto_canny(self, img, sigma=0.95):
         blurred = cv2.GaussianBlur(img, (3, 3), 0)
         v = numpy.median(blurred)
         lower = int(max(0, (1.0 - sigma) * v))
@@ -79,8 +80,10 @@ class EdgeTest:
 
         # edge detection https://stackoverflow.com/questions/50274063/find-coordinates-of-a-canny-edge-image-opencv-python
         indices = numpy.where(edged != [0])
+        print(indices)
         coordinates = zip(indices[0], indices[1])
-        print(coordinates)
+        print(list(coordinates))
+        time.sleep(1)
 
         return edged
 
@@ -104,7 +107,6 @@ class EdgeTest:
 
         while True:
             await asyncio.sleep(0)
-
 
 if __name__ == '__main__':
     EdgeTest()
