@@ -58,7 +58,18 @@ class EdgeTest:
             cv2.imwrite('cv2_edge_output.png', cv2_edges)
 
         # Convert output image back to PIL image
+        cvimg = cv2.cvtColor(cv2_edges, cv2.COLOR_GRAY2RGB)
         pil_edges = PIL.Image.fromarray(cv2.cvtColor(cv2_edges, cv2.COLOR_GRAY2RGB))
+        threshold = 60
+        minLineLength = 10
+        lines = cv2.HoughLinesP(cv2_edges, 1, numpy.pi/180, threshold, 0, minLineLength, 20)
+        if (lines is None or len(lines) == 0):
+            return
+        print (lines)
+        for line in lines[0]:
+            #print line
+            cv2.line(cv2_image, (line[0],line[1]), (line[2],line[3]), (0,255,0), 2)
+        time.sleep(1)
 
         # Display input and output feed
         display_image_input = PIL.ImageTk.PhotoImage(image=image.annotate_image())
@@ -83,7 +94,7 @@ class EdgeTest:
 
         #print(indices)
         coordinates = zip(indices[0], indices[1])
-        print(list(coordinates))
+        #print(list(coordinates))
         threshold = 60
         minLineLength = 10
         lines = cv2.HoughLinesP(edges, 1, numpy.pi/180, threshold, 0, minLineLength, 20)
@@ -94,7 +105,7 @@ class EdgeTest:
             #print line
             cv2.line(img, (line[0],line[1]), (line[2],line[3]), (0,255,0), 2)
         time.sleep(1)
-
+        
         return edges
 
     async def set_up_cozmo(self, coz_conn):
