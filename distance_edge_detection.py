@@ -76,17 +76,26 @@ class EdgeTest:
         v = numpy.median(blurred)
         lower = int(max(0, (1.0 - sigma) * v))
         upper = int(min(255, (1.0 + sigma) * v))
-        edged = cv2.Canny(blurred, lower, upper)
+        edges = cv2.Canny(blurred, lower, upper)
 
         # edge detection https://stackoverflow.com/questions/50274063/find-coordinates-of-a-canny-edge-image-opencv-python
-        indices = numpy.where(edged != [0])
+        indices = numpy.where(edges != [0])
 
         #print(indices)
         coordinates = zip(indices[0], indices[1])
         print(list(coordinates))
+        threshold = 60
+        minLineLength = 10
+        lines = cv2.HoughLinesP(edges, 1, numpy.pi/180, threshold, 0, minLineLength, 20)
+        if (lines is None or len(lines) == 0):
+            return
+        #print lines
+        for line in lines[0]:
+            #print line
+            cv2.line(img, (line[0],line[1]), (line[2],line[3]), (0,255,0), 2)
         time.sleep(1)
 
-        return edged
+        return edges
 
     async def set_up_cozmo(self, coz_conn):
         asyncio.set_event_loop(coz_conn._loop)
