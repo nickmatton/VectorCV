@@ -76,6 +76,12 @@ class EdgeTest:
         lower = int(max(0, (1.0 - sigma) * v))
         upper = int(min(255, (1.0 + sigma) * v))
         edged = cv2.Canny(blurred, lower, upper)
+
+        # edge detection https://stackoverflow.com/questions/50274063/find-coordinates-of-a-canny-edge-image-opencv-python
+        indices = numpy.where(edged != [0])
+        coordinates = zip(indices[0], indices[1])
+        print(coordinates)
+
         return edged
 
     async def set_up_cozmo(self, coz_conn):
@@ -83,16 +89,14 @@ class EdgeTest:
         self._robot = await coz_conn.wait_for_robot()
         self._robot.camera.image_stream_enabled = True
         self._robot.add_event_handler(cozmo.world.EvtNewCameraImage, self.on_new_camera_image)
-        self._robot.move_lift(3)
-        self._robot.set_head_angle(degrees(-25)).wait_for_completed()
-        #self._robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+        self._robot.move_lift(-3)
+        self._robot.set_head_angle(degrees(0)).wait_for_completed()
 
     async def run(self, coz_conn, _use_3d_viewer=True, _use_viewer=True):
         # Set up Cozmo
         await self.set_up_cozmo(coz_conn)
 
         self._tk_root = tkinter.Tk()
-        # TODO: ESC to exit
         self._tk_label_input = tkinter.Label(self._tk_root)
         self._tk_label_output = tkinter.Label(self._tk_root)
         self._tk_label_input.pack()
