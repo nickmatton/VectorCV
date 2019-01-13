@@ -80,6 +80,7 @@ class EdgeTest:
 
         # edge detection https://stackoverflow.com/questions/50274063/find-coordinates-of-a-canny-edge-image-opencv-python
         indices = numpy.where(edged != [0])
+
         #print(indices)
         coordinates = zip(indices[0], indices[1])
         print(list(coordinates))
@@ -107,7 +108,6 @@ class EdgeTest:
 
         while True:
             await asyncio.sleep(1)
-
 
 if __name__ == '__main__':
     EdgeTest()
