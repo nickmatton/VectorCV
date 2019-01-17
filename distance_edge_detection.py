@@ -21,15 +21,9 @@ WRITE_TO_FILE = True
 # to ~/.bash_profile add:
 #   PYTHONPATH="/usr/local/Cellar/opencv3/HEAD-dd379ec_4/lib/python3.5/site-packages/:$PYTHONPATH"
 #   export PYTHONPATH
-
-'''
-Edge Test
--Experimenting with Cozmo's camera and OpenCV
--Displays TKinter window with both pre and post-processed live camera feed
--Current frame can also written to file
-
-@author Team Cozplay
-'''
+count = 0
+width = 0
+height = 0
 
 
 class EdgeTest:
@@ -65,11 +59,23 @@ class EdgeTest:
         lines = cv2.HoughLinesP(cv2_edges, 1, numpy.pi/180, threshold, 0, minLineLength, 20)
         if (lines is None or len(lines) == 0):
             return
-        print (lines)
+        arr = numpy.array(lines)
+        global count, height, width
+        if count < 90 and arr.size > 15:
+            count = count + 1
+            height = height + arr[0, 0, 1] - arr[0, 0, 3] + arr[1, 0, 1] - arr[1, 0, 3]
+            width = width + arr[2, 0, 2] - arr[2, 0, 0] + arr[3, 0, 2] - arr[3, 0, 0]
         for line in lines[0]:
-            #print line
             cv2.line(cv2_image, (line[0],line[1]), (line[2],line[3]), (0,255,0), 2)
-        time.sleep(1)
+
+        if count >= 90:
+            print("Width: ")
+            print(width / 2 / count)
+            print('\n')
+            print("Height: ")
+            print(height / 2 / count)
+            print('\n')
+            exit(0)
 
         # Display input and output feed
         display_image_input = PIL.ImageTk.PhotoImage(image=image.annotate_image())
@@ -104,7 +110,7 @@ class EdgeTest:
         for line in lines[0]:
             #print line
             cv2.line(img, (line[0],line[1]), (line[2],line[3]), (0,255,0), 2)
-        time.sleep(1)
+        time.sleep(0.1)
         
         return edges
 
@@ -117,17 +123,16 @@ class EdgeTest:
         self._robot.set_head_angle(degrees(0)).wait_for_completed()
 
     async def run(self, coz_conn, _use_3d_viewer=True, _use_viewer=True):
-        # Set up Cozmo
-        await self.set_up_cozmo(coz_conn)
+            # Set up Cozmo
+            await self.set_up_cozmo(coz_conn)
+            self._tk_root = tkinter.Tk()
+            self._tk_label_input = tkinter.Label(self._tk_root)
+            self._tk_label_output = tkinter.Label(self._tk_root)
+            self._tk_label_input.pack()
+            self._tk_label_output.pack()
 
-        self._tk_root = tkinter.Tk()
-        self._tk_label_input = tkinter.Label(self._tk_root)
-        self._tk_label_output = tkinter.Label(self._tk_root)
-        self._tk_label_input.pack()
-        self._tk_label_output.pack()
-
-        while True:
-            await asyncio.sleep(1)
+            while True:
+                await asyncio.sleep(0)
 
 if __name__ == '__main__':
     EdgeTest()
