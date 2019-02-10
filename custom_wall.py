@@ -1,11 +1,10 @@
-'''This example demonstrates how you can define custom objects.
-
-The example defines several custom objects (2 cubes, a wall and a box). When
-Cozmo sees the markers for those objects he will report that he observed an
-object of that size and shape there.
-
-You can adjust the markers, marker sizes, and object sizes to fit whatever
-object you have and the exact size of the markers that you print out.
+'''
+The program lets cozmo recognize custom walls with the custom markers.
+A 3D map is generated to show Cozmo's surroundings including the
+walls and other recognizable objects. The user can control the Cozmo.
+When it finds the cube, it will make it light blue.
+Author: Tony Pan
+Date: 01-28-2019
 '''
 
 import time
@@ -17,59 +16,60 @@ from cozmo.objects import CustomObject, CustomObjectMarkers, CustomObjectTypes
 def handle_object_appeared(evt, **kw):
     # This will be called whenever an EvtObjectAppeared is dispatched -
     # whenever an Object comes into view.
-    if isinstance(evt.obj, CustomObject):
-        if evt.obj.object_id == 0:
-            cozmo.robot.Robot.say_text("North Wall").wait_for_completed()
-            print("Cozmo started seeing a %s" % str(evt.obj.object_id))
-        elif evt.obj.object_id == 1:
-            cozmo.robot.Robot.say_text("East Wall").wait_for_completed()
-            print("Cozmo started seeing a %s" % str(evt.obj.object_id))
-        elif evt.obj.object_id == 2:
-            cozmo.robot.Robot.say_text("South Wall").wait_for_completed()
-            print("Cozmo started seeing a %s" % str(evt.obj.object_id))
-        elif evt.obj.object_id == 3:
-            cozmo.robot.Robot.say_text("West Wall").wait_for_completed()
-            print("Cozmo started seeing a %s" % str(evt.obj.object_id))
+    if int(evt.obj.object_id) == 5:
+        # cozmo.robot.Robot.say_text(text="North Wall").wait_for_completed()
+        print("Cozmo started seeing a %s" % str(evt.obj.object_id))
+    elif int(evt.obj.object_id) == 6:
+        # cozmo.robot.Robot.say_text(text="East Wall").wait_for_completed()
+        print("Cozmo started seeing a %s" % str(evt.obj.object_id))
+    elif int(evt.obj.object_id) == 7:
+        # cozmo.robot.Robot.say_text(text="South Wall").wait_for_completed()
+        print("Cozmo started seeing a %s" % str(evt.obj.object_id))
+    elif int(evt.obj.object_id) == 8:
+        # cozmo.robot.Robot.say_text(text="West Wall").wait_for_completed()
+        print("Cozmo started seeing a %s" % str(evt.obj.object_id))
+    elif evt.obj.object_type == cozmo.objects.LightCube:
+        cozmo.lights.blue_light
 
 
-# def handle_object_disappeared(evt, **kw):
+def handle_object_disappeared(evt, **kw):
     # This will be called whenever an EvtObjectDisappeared is dispatched -
     # whenever an Object goes out of view.
-    # if isinstance(evt.obj, CustomObject):
-        # print("Cozmo stopped seeing a %s" % str(evt.obj.object_type))
+    if isinstance(evt.obj, CustomObject):
+        print("Cozmo stopped seeing a %s" % str(evt.obj.object_id))
 
 
 def custom_objects(robot: cozmo.robot.Robot):
     # Add event handlers for whenever Cozmo sees a new object
     robot.add_event_handler(cozmo.objects.EvtObjectAppeared, handle_object_appeared)
-    # robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
+    robot.add_event_handler(cozmo.objects.EvtObjectDisappeared, handle_object_disappeared)
 
     # define a unique wall (150mm x 120mm (x10mm thick for all walls)
     # with a 50mm x 30mm Circles2 image on front and back
     north_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType02,
                                                 CustomObjectMarkers.Circles2,
-                                                150, 300,
+                                                300, 150,
                                                 63, 63, True)
 
     # define a unique wall (150mm x 120mm (x10mm thick for all walls)
     # with a 50mm x 30mm Circles2 image on front and back
-    east_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType02,
+    east_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType03,
                                                 CustomObjectMarkers.Circles3,
-                                                150, 300,
+                                                300, 150,
                                                 63, 63, True)
 
     # define a unique wall (150mm x 120mm (x10mm thick for all walls)
     # with a 50mm x 30mm Circles2 image on front and back
-    south_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType02,
+    south_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType04,
                                                 CustomObjectMarkers.Circles4,
-                                                150, 300,
+                                                300, 150,
                                                 63, 63, True)
 
     # define a unique wall (150mm x 120mm (x10mm thick for all walls)
     # with a 50mm x 30mm Circles2 image on front and back
-    west_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType02,
+    west_wall = robot.world.define_custom_wall(CustomObjectTypes.CustomType05,
                                                 CustomObjectMarkers.Circles5,
-                                                150, 300,
+                                                300, 150,
                                                 63, 63, True)
 
     if ((north_wall is not None) and (east_wall is not None) and
